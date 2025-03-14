@@ -1,0 +1,1 @@
+# Compatibilização de malhas de setores censitários entre censos
