@@ -6,6 +6,8 @@ from shapely import LineString, Polygon, MultiPolygon, distance, intersects, min
 from shapely.geometry import box
 from shapely.wkt import loads, dumps
 
+AP_RATIO = 0.2
+
 
 # Códigos URM em SIRGAS 2000
 UTMCODES = {
@@ -47,7 +49,7 @@ def geomIsResidual(geom):
     Avalia se geometria é espúria
     '''
     ap_ratio = geom.area/geom.length
-    return (ap_ratio < 0.2)
+    return (ap_ratio < AP_RATIO)
 
 def removeHoles(geom, area_min=1):
     '''
@@ -196,6 +198,13 @@ class compatibility_graph(nx.Graph):
         self.makeGridUnion()
         self.classifyGridChanges()
         self.setNodes()
+
+        # Cria atributos
+        self.AMC = None
+        self.compatTable_A = None
+        self.compatTable_B = None
+        self.edge_gdf = None
+        self.node_gdf = None
 
 
     def _classifyIdChanges(self):
@@ -514,3 +523,16 @@ class compatibility_graph(nx.Graph):
         self.node_gdf.to_file(f'malhas/{compatName}_AMC.gpkg',
                             layer=f'{name_C1}-{name_C2}_nodes',
                             driver='GPKG')
+        
+    def reportCompat(self):
+        data_nodes = data_nodes.pivot_table(index='')
+
+        pivot_edges = self.edge_gdf.pivot_table(index='metodo', values='geometry', aggfunc='count').reset
+        dic = {
+            'Setores C1': len(self.m1),
+            'Setores C2': len(self.m2),
+            'Correspondências totais': len(self.edge_gdf()),
+
+
+        }
+        return None
