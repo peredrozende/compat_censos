@@ -2,3 +2,5 @@ pandas
 geopandas
 networkx
 shapely
+ipykernel
+pyarrow
