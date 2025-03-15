@@ -1,0 +1,100 @@
+{
+    "par\u00e2metros": {
+        "raz\u00e3o A/P": 0.2,
+        "Limite base de sobreposi\u00e7\u00e3o (L)": [
+            0.8
+        ],
+        "Buffers": [
+            {
+                "buffer": -20,
+                "use_all": false
+            },
+            {
+                "buffer": -10,
+                "use_all": false
+            },
+            {
+                "buffer": 0,
+                "use_all": true
+            }
+        ]
+    },
+    "malhas": {
+        "Setores C1": 30815,
+        "Setores C2": 47184
+    },
+    "correspondencias": {
+        "Correspond\u00eancias totais": {
+            "n": 50281,
+            "pct": 1
+        },
+        "Divis\u00e3o": {
+            "n": 22600,
+            "pct": 0.4494739563652274
+        },
+        "Manuten\u00e7\u00e3o": {
+            "n": 18128,
+            "pct": 0.3605338000437541
+        },
+        "Manuten\u00e7\u00e3o desassociada": {
+            "n": 749,
+            "pct": 0.014896282890157316
+        },
+        "Sobreposi\u00e7\u00e3o (-10m)": {
+            "n": 1845,
+            "pct": 0.03669378095105507
+        },
+        "Sobreposi\u00e7\u00e3o (-20m)": {
+            "n": 6537,
+            "pct": 0.13000934746723414
+        },
+        "Sobreposi\u00e7\u00e3o (0m)": {
+            "n": 422,
+            "pct": 0.008392832282571946
+        }
+    },
+    "operacoes": {
+        "Opera\u00e7\u00f5es totais": {
+            "n": 28263,
+            "pct": 1
+        },
+        "1:1": {
+            "n": 18973,
+            "pct": 0.671301701871705
+        },
+        "1:n": {
+            "n": 8033,
+            "pct": 0.28422318932880447
+        },
+        "m:n": {
+            "n": 1101,
+            "pct": 0.03895552489120051
+        },
+        "n:1": {
+            "n": 156,
+            "pct": 0.005519583908289991
+        }
+    },
+    "metricas": {
+        "Manuten\u00e7\u00f5es inconsistentes": {
+            "n": 120,
+            "pct": 0.0033097969991173876
+        },
+        "Divis\u00f5es n\u00e3o puras": {
+            "n": 4246.0,
+            "pct": 0.18787610619469028
+        },
+        "Setores desconexos": {
+            "n": 2,
+            "pct": 2.5641354376338157e-05
+        },
+        "Isolados persistentes": {
+            "n": 422,
+            "pct": 0.005410325773407352
+        },
+        "Redesenhos extensos": {
+            "n": 22,
+            "pct": 0.0007784028588614089
+        }
+    }
+}

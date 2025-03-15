@@ -1,4 +1,5 @@
 import os
+import json
 import geopandas as gpd
 import pandas as pd
 import networkx as nx
@@ -7,7 +8,6 @@ from shapely.geometry import box
 from shapely.wkt import loads, dumps
 
 AP_RATIO = 0.2
-
 
 # Códigos URM em SIRGAS 2000
 UTMCODES = {
@@ -100,7 +100,6 @@ def makeCensusGrid(gpkg_file, id_column, layer=None, mun_filter=[]):
 
     return gdf
 
-
 def getNeighbors(row, geogrid):
     '''
     Identifica vizinhos de cada geometria de uma malha
@@ -112,7 +111,6 @@ def getNeighbors(row, geogrid):
         df_neighbors = df_neighbors.query('GROUP == @group')
 
     return df_neighbors['ID'].to_list()
-
 
 def makeNeighborhoodGraph(gdf):
     '''
@@ -133,7 +131,6 @@ def makeNeighborhoodGraph(gdf):
                        geom=LineString([G.nodes[i['ID']]['center'], G.nodes[i['NEIGHBOR']]['center']]))
     return G
 
-
 def exportNeighborhoodGraph(gdf, gpkg_file, layer=''):
     '''
     Exporta grafo de vizinhança em gpkg
@@ -144,7 +141,6 @@ def exportNeighborhoodGraph(gdf, gpkg_file, layer=''):
     geograph = gpd.GeoDataFrame(df, geometry='geometry', crs=gdf.crs)
     geograph.to_file(gpkg_file, layer=layer, driver='GPKG')
 
-
 def getNeighborhoods(geogrid):
     '''
     Retorna coluna de vizinhos dos setores como dicionário
@@ -152,7 +148,6 @@ def getNeighborhoods(geogrid):
     dic = geogrid[['ID', 'NEIGHBOR']].to_dict(orient='records')
     dic = {k['ID']:k['NEIGHBOR'] for k in dic}
     return dic
-
 
 def getGeometries(geogrid):
     '''
@@ -165,7 +160,6 @@ def getGeometries(geogrid):
 
 def evaluateUnionArea(gridUnion, ):
     gdf = gridUnion.query('`A.ID` == `B.ID` & `A.PCT_AREA')
-
 
 def bboxIntersects(geom1, geom2):
     '''
@@ -205,7 +199,8 @@ class compatibility_graph(nx.Graph):
         self.compatTable_B = None
         self.edge_gdf = None
         self.node_gdf = None
-
+        self.threshold = []
+        self.buffer = []
 
     def _classifyIdChanges(self):
         '''
@@ -245,7 +240,7 @@ class compatibility_graph(nx.Graph):
             else:
                 class_data[k] = ''
         return class_data
-    
+
     def classifyGridChanges(self):
         '''
         Aplica o classificador nas malhas
@@ -255,7 +250,7 @@ class compatibility_graph(nx.Graph):
         self.m2['CLASS'] = self.m2['ID'].apply(lambda x: alteracoes[x])
         self.gridUnion['A.CLASS'] = self.gridUnion['A.ID'].apply(lambda x: alteracoes[x])
         self.gridUnion['B.CLASS'] = self.gridUnion['B.ID'].apply(lambda x: alteracoes[x])
-        
+
     def setNodes(self):
         '''
         Cria os nós do grafo
@@ -277,7 +272,6 @@ class compatibility_graph(nx.Graph):
                         center=row['geometry'].representative_point(),
                         classe=row['CLASS'])
 
-
     def _prepareGridForUnion(self, geogrid, prefix=''):
         '''
         Faz tratamento das geometrias para interseção
@@ -288,7 +282,7 @@ class compatibility_graph(nx.Graph):
         # Correção contra bug GEOSException: TopologyException: found non-noded intersection
         geogrid[f'{prefix}.geometry'] = [loads(dumps(geom, rounding_precision=3)) for geom in geogrid[f'{prefix}.geometry']]
         return geogrid
-    
+
     def makeGridUnion(self):
         '''
         Cria grid intersecionado de m1 e m2
@@ -324,8 +318,6 @@ class compatibility_graph(nx.Graph):
         # Avalia correspondência de área entre ids distintos acima de 80%
         self.gridUnion['OUTER_MATCH'] = self.gridUnion.apply(lambda x: x['A.ID'] != x['B.ID'] and (x['A.PCT_AREA'] > 0.8 or x['B.PCT_AREA'] > 0.8), axis=1)
 
-
-
     def compatManutencao(self):
         '''
         Adiciona arestas de manutenção
@@ -335,7 +327,6 @@ class compatibility_graph(nx.Graph):
                           f"B.{s}",
                           metodo='Manutenção')
 
-    
     def compatDivisao(self, threshold):
         '''
         Adiciona arestas de divisão
@@ -352,8 +343,8 @@ class compatibility_graph(nx.Graph):
             self.add_edge(f"A.{row['A.ID']}",
                           f"B.{row['B.ID']}",
                           metodo='Divisão')
+        self.threshold.append(threshold)
         self.clearGroups()
-
     
     def compatSobreposicao(self, buffer, use_all=False):
         '''
@@ -402,9 +393,9 @@ class compatibility_graph(nx.Graph):
             self.add_edge(f"A.{row['ID']}",
                             f"B.{row['B.ID']}",
                             metodo=f'Sobreposição ({buffer}m)')
+            
+        self.buffer.append({'buffer':buffer, 'use_all':use_all})
         self.clearGroups()
-
-
 
     def clearGroups(self):
         '''
@@ -421,7 +412,6 @@ class compatibility_graph(nx.Graph):
             # Remove as arestas entre grupos apenas de nós que tem vínculos válidos
             if not all([e in to_remove for e in self.edges(u)]) and not all([e in to_remove for e in self.edges(v)]):
                 self.remove_edge(u,v)
-
 
     def _codifyCompat(self):
         '''
@@ -447,7 +437,6 @@ class compatibility_graph(nx.Graph):
         self.compatTable_A = df_matriz_A.explode('ID')
         df_matriz_B = pd.DataFrame(matriz_B)
         self.compatTable_B = df_matriz_B.explode('ID')
-
 
     def _prepareExport(self):
         '''
@@ -477,7 +466,6 @@ class compatibility_graph(nx.Graph):
         gdf_pc['geometry'] = gdf_pc['geometry'].apply(removeHoles)
         self.AMC = gdf_pc
 
-
     def _prepareGraphExport(self):
         '''
         Cria representação geográfica do grafo de compatibilidade
@@ -503,8 +491,7 @@ class compatibility_graph(nx.Graph):
             k['grau'] = len(self[f"{k['malha']}.{k['nome']}"])
         node_gdf = gpd.GeoDataFrame(node_data, geometry='center', crs=self.m2.crs)
         self.node_gdf = node_gdf[['nome', 'malha', 'classe', 'group', 'grau', 'center']]
-        
-
+    
     def exportCompatFiles(self, compatName, name_C1, name_C2):
         '''
         Exporta os arquivos de compatibilização
@@ -523,16 +510,77 @@ class compatibility_graph(nx.Graph):
         self.node_gdf.to_file(f'malhas/{compatName}_AMC.gpkg',
                             layer=f'{name_C1}-{name_C2}_nodes',
                             driver='GPKG')
+
+    def reportCompat(self, file=None):
+        '''
+        Calcula e salva resultados e métricas da compatibilização em um arquivo de texto json
+        '''
+        # Manutenções inconsistentes
+        mincs = len(self.node_gdf.query('classe == "Manutenção" & grau > 1'))
+        pct_mincs = mincs/len(self.node_gdf.query('classe == "Manutenção"'))
+
+        # Isolados persistentes
+        df = (self.edge_gdf.merge(self.compatTable_B, left_on='B.nome', right_on='ID', how='left')
+                           .merge(self.AMC.reset_index()[['CD_PERIMETRO', 'TIPO_CORRESP']], on='CD_PERIMETRO', how='left' ))
+        ips = len(df.query('metodo == "Sobreposição (0m)"'))
+        pct_ips = ips/len(self.node_gdf)
         
-    def reportCompat(self):
-        data_nodes = data_nodes.pivot_table(index='')
+        # Razão de divisões não puras
+        df = df.pivot_table(index='TIPO_CORRESP', columns='metodo', values='B.nome', aggfunc='count')
+        dnp = float(df.loc['m:n','Divisão'])
+        pct_dnp = float(dnp/df['Divisão'].sum())
 
-        pivot_edges = self.edge_gdf.pivot_table(index='metodo', values='geometry', aggfunc='count').reset
+        # Desconexos
+        dcxs = len(self.node_gdf.query('grau == 0'))
+        pct_dcxs = dcxs/len(self.node_gdf)
+
+        # Dados de compatibilização
+        edge_data = self.edge_gdf.pivot_table(index='metodo', values='geometry', aggfunc='count').to_dict()['geometry']
+        tt_edges = len(self.edge_gdf)
+        edge_data = {k:{'n':v, 'pct':v/tt_edges} for k, v in edge_data.items()}
+        
+        # Dados de operações
+        amcs_data = self.AMC.pivot_table(index='TIPO_CORRESP', values='geometry', aggfunc='count').to_dict()['geometry']
+        tt_amcs = len(self.AMC)
+        amcs_data = {k:{'n':v, 'pct':v/tt_amcs} for k, v in amcs_data.items()}
+
+        # Redesenhos extensos
+        rdex = len(self.AMC.query('membros_A > 10 & membros_B > 10'))
+        pct_rdex = rdex/tt_amcs
+
+        # Estruturação do relatório
         dic = {
-            'Setores C1': len(self.m1),
-            'Setores C2': len(self.m2),
-            'Correspondências totais': len(self.edge_gdf()),
-
-
+            'parametros':{
+                'razão A/P': AP_RATIO,
+                'Limite base de sobreposicao (L)': self.threshold,
+                'Buffers': self.buffer
+            },
+            'malhas':{
+                'Setores C1': len(self.m1),
+                'Setores C2': len(self.m2),
+            },
+            'correspondencias':{
+                'Correspondências totais': {'n':tt_edges, 'pct':1},
+            },
+            'operacoes':{
+                'Operações totais': {'n':tt_amcs, 'pct':1},
+            },
+            'metricas':{
+                'Manutencoes inconsistentes': {'n':mincs, 'pct':pct_mincs},
+                'Divisoes nao puras': {'n':dnp, 'pct':pct_dnp},
+                'Setores desconexos': {'n':dcxs, 'pct':pct_dcxs},
+                'Isolados persistentes':{'n':ips, 'pct':pct_ips},
+                'Redesenhos extensos':{'n':rdex, 'pct':pct_rdex},
+            }
         }
-        return None
+
+        # Adiciona informações de pivot_tables
+        dic['correspondencias'].update(edge_data)
+        dic['operacoes'].update(amcs_data)
+
+        # Salva em arquivo
+        if file:
+            with open(f'{file}.json', 'w') as fp:
+                json.dump(dic, fp)
+
+        return dic
