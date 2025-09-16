@@ -23,16 +23,16 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     showgrid="true"
+     showgrid="false"
      inkscape:zoom="1.1217803"
-     inkscape:cx="218.40284"
-     inkscape:cy="1018.4704"
+     inkscape:cx="263.86628"
+     inkscape:cy="598.60206"
      inkscape:window-width="2560"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1">
+     inkscape:current-layer="g118">
     <inkscape:grid
        id="grid1"
        units="mm"
@@ -48,7 +48,7 @@
        dotted="false"
        gridanglex="30"
        gridanglez="30"
-       visible="true" />
+       visible="false" />
   </sodipodi:namedview>
   <defs
      id="defs1">
@@ -3891,35 +3891,35 @@
        transform="translate(-4.9999993,-12.999998)">
       <g
          id="g111"
-         style="fill:#ced1fb;fill-opacity:1;stroke:none;stroke-opacity:1"
+         style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-opacity:1"
          transform="translate(-40.000064,-27.000086)">
         <path
            d="m 95.000064,195.00017 h 8.999966 v -3.99975 h -8.999966 z"
-           style="fill:#ced1fb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+           style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
            id="path93-1" />
         <path
            d="m 104.99997,199.99987 v -4.9997 h -9.999906 v 4.9997 c 0,0 2.51595,-2.50011 4.9997,-2.50011 1.862806,0 3.744526,1.4068 4.568706,2.10995 0.27409,0.2339 0.4315,0.39016 0.4315,0.39016 z"
-           style="fill:#ced1fb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+           style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
            id="path90-6" />
         <path
            d="m 104.99997,200.00038 c 0,0 -0.15679,-0.15629 -0.4315,-0.39067 0,0 -5.2e-4,-5.2e-4 -5.2e-4,-5.2e-4 -0.48081,-0.41017 -1.32104,-1.05928 -2.30735,-1.5291 0,0 -5.2e-4,-5.2e-4 -5.2e-4,-5.2e-4 -0.24453,-0.11645 -0.49937,-0.21841 -0.75861,-0.30644 -0.0798,-0.0271 -0.15997,-0.0518 -0.24081,-0.0755 -0.4129,-0.12066 -0.83673,-0.1974 -1.26039,-0.1974 -2.483746,0 -5.000206,2.5001 -5.000206,2.5001 z"
-           style="fill:#ced1fb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+           style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
            id="path88-9" />
         <path
            d="m 110.00018,205.00008 -1.99988,-1.99988 h -3.00033 v -2.99982 h -9.999906 v 4.9997 z"
-           style="fill:#ced1fb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+           style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
            id="path85-7" />
         <path
            d="m 106.00042,191.00042 h -2.00039 v 3.99975 h 0.99994 1.00045 z"
-           style="fill:#ced1fb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+           style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
            id="path72-3" />
         <path
            d="m 108.0004,203.00008 -2.99982,-2.99982 h -5.1e-4 v 2.99982 z"
-           style="fill:#ced1fb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
+           style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
            id="path87-2" />
         <path
            d="m 110.00079,205.00021 v -1.99988 h -1.99988 z"
-           style="fill:#ced1fb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
+           style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
            id="path86-5" />
       </g>
       <g
@@ -4063,26 +4063,6 @@
              id="path108-3"
              sodipodi:nodetypes="ccccc" />
           <path
-             d="m 144.00012,184.99997 v -5.00022 h -4.9997 l 0.45476,5.00022 h 0.54518 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path107-8" />
-          <path
-             d="m 148.25051,184.99997 -0.25012,-5.00022 h -4.00027 v 5.00022 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path106-6" />
-          <path
-             d="m 152.74997,184.99997 1.25006,-5.00022 h -5.99964 l 0.25012,5.00022 h 0.74982 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path105-8" />
-          <path
-             d="m 151.49992,189.99966 h 2.50011 v -9.99991 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path104-9" />
-          <path
-             d="m 151.49992,189.99966 1.25005,-4.99969 h -3.74964 v 4.99969 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path103-2" />
-          <path
              d="m 149.00033,204.99978 v -4.9997 c -0.16802,0 -0.32517,-0.0185 -0.47801,-0.0439 -0.0736,-0.0122 -0.14796,-0.023 -0.21859,-0.0403 -0.0303,-0.007 -0.0586,-0.0181 -0.0884,-0.0263 -0.0768,-0.0214 -0.15358,-0.0426 -0.22738,-0.0693 -0.0335,-0.0121 -0.0652,-0.0272 -0.0982,-0.0403 -0.0686,-0.0272 -0.13756,-0.0542 -0.20412,-0.0853 -0.0215,-0.01 -0.0422,-0.0216 -0.0636,-0.032 -0.0766,-0.0373 -0.15282,-0.075 -0.22738,-0.11627 -0.0136,-0.008 -0.0268,-0.0161 -0.0403,-0.0238 -0.0804,-0.0454 -0.16033,-0.0922 -0.23927,-0.14107 -0.0281,-0.0174 -0.0558,-0.0366 -0.0837,-0.0543 -0.15433,-0.0977 -0.30823,-0.19735 -0.4625,-0.29973 l -2.44637,-0.97875 c -0.0719,-0.004 -0.14155,-0.0113 -0.21652,-0.0114 l -4.90565,1.96267 2.99982,2.99982 h 1.99988 v 1.99988 z"
              style="fill:#ffffff;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
              id="path84-4" />
@@ -4090,42 +4070,65 @@
              d="m 154.00003,197.00027 c -4e-4,4e-4 -0.18807,0.18775 -0.50023,0.4687 -0.93772,0.84389 -2.99972,2.53111 -4.49947,2.53111 v 4.9997 h 4.9997 z"
              style="fill:#ffffff;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
              id="path83-7" />
-          <path
-             d="m 154.00003,194.99987 -4.99918,4.9997 c 0.12484,-3e-5 0.25333,-0.0117 0.38499,-0.0336 0.26367,-0.0439 0.53926,-0.12862 0.81855,-0.24288 0.27929,-0.11425 0.56253,-0.25797 0.84181,-0.4191 0.97726,-0.5638 1.90666,-1.34282 2.4536,-1.83503 0.0193,-0.0174 0.0132,-0.0128 0.0315,-0.0294 0.27785,-0.25215 0.46871,-0.43977 0.46871,-0.43977 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path80-1" />
-          <path
-             d="m 150.25038,194.99987 -1.25005,4.9997 4.9997,-4.9997 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path79-1" />
-          <path
-             d="m 150.25038,194.99987 h 3.74965 v -5.00021 h -2.50011 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path78-5" />
-          <path
-             d="m 148.75022,194.99987 0.25011,4.9997 1.25005,-4.9997 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path77-9" />
-          <path
-             d="m 148.75022,194.99987 h 1.50016 l 1.24954,-5.00021 h -2.49959 v -4.99969 h -0.74982 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path76-4" />
-          <path
-             d="m 144.00012,194.99987 v 2.99982 l 0.12299,0.0491 c 0.0823,0.005 0.1649,0.009 0.2434,0.0191 0.0517,0.006 0.1007,0.0164 0.15089,0.0248 0.0763,0.0128 0.15284,0.0253 0.22583,0.0424 0.0436,0.0102 0.0851,0.023 0.12764,0.0346 0.0752,0.0206 0.15066,0.041 0.22272,0.0656 0.0363,0.0124 0.0709,0.0265 0.10646,0.0398 0.0775,0.029 0.15462,0.0585 0.22892,0.0915 0.0165,0.007 0.0323,0.0153 0.0486,0.0227 0.19062,0.0873 0.37216,0.18511 0.54725,0.2899 0.0523,0.0313 0.1016,0.065 0.15296,0.0972 0.13361,0.0838 0.26765,0.16753 0.3974,0.25373 l 2.42362,0.96945 c 5.3e-4,0 0.001,0 0.002,0 l -0.25011,-4.9997 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path75-3" />
-          <path
-             d="m 144.00012,194.99987 h 4.7501 l -0.49971,-9.9999 h -4.25039 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path74-0" />
-          <path
-             d="m 140.00036,194.99987 h -0.99994 v 4.9997 h 5.2e-4 c 6.5e-4,-4.9e-4 0.36733,-0.27592 0.94671,-0.62064 0.3866,-0.23 0.86779,-0.49088 1.39733,-0.72088 0.79432,-0.34502 1.69771,-0.62115 2.5554,-0.62115 0.002,0 0.004,-2e-5 0.006,0 l 0.0935,-0.0372 v -2.99982 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path73-3" />
-          <path
-             d="m 140.00036,191.00012 v 3.99975 h 3.99976 v -9.9999 h -3.99976 z"
-             style="fill:#ced1fb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
-             id="path71-6" />
+          <g
+             id="g1">
+            <path
+               d="m 144.00012,184.99997 v -5.00022 h -4.9997 l 0.45476,5.00022 h 0.54518 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path107-8" />
+            <path
+               d="m 148.25051,184.99997 -0.25012,-5.00022 h -4.00027 v 5.00022 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path106-6" />
+            <path
+               d="m 152.74997,184.99997 1.25006,-5.00022 h -5.99964 l 0.25012,5.00022 h 0.74982 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path105-8" />
+            <path
+               d="m 151.49992,189.99966 h 2.50011 v -9.99991 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path104-9" />
+            <path
+               d="m 151.49992,189.99966 1.25005,-4.99969 h -3.74964 v 4.99969 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path103-2" />
+            <path
+               d="m 154.00003,194.99987 -4.99918,4.9997 c 0.12484,-3e-5 0.25333,-0.0117 0.38499,-0.0336 0.26367,-0.0439 0.53926,-0.12862 0.81855,-0.24288 0.27929,-0.11425 0.56253,-0.25797 0.84181,-0.4191 0.97726,-0.5638 1.90666,-1.34282 2.4536,-1.83503 0.0193,-0.0174 0.0132,-0.0128 0.0315,-0.0294 0.27785,-0.25215 0.46871,-0.43977 0.46871,-0.43977 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path80-1" />
+            <path
+               d="m 150.25038,194.99987 -1.25005,4.9997 4.9997,-4.9997 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path79-1" />
+            <path
+               d="m 150.25038,194.99987 h 3.74965 v -5.00021 h -2.50011 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path78-5" />
+            <path
+               d="m 148.75022,194.99987 0.25011,4.9997 1.25005,-4.9997 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path77-9" />
+            <path
+               d="m 148.75022,194.99987 h 1.50016 l 1.24954,-5.00021 h -2.49959 v -4.99969 h -0.74982 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path76-4" />
+            <path
+               d="m 144.00012,194.99987 v 2.99982 l 0.12299,0.0491 c 0.0823,0.005 0.1649,0.009 0.2434,0.0191 0.0517,0.006 0.1007,0.0164 0.15089,0.0248 0.0763,0.0128 0.15284,0.0253 0.22583,0.0424 0.0436,0.0102 0.0851,0.023 0.12764,0.0346 0.0752,0.0206 0.15066,0.041 0.22272,0.0656 0.0363,0.0124 0.0709,0.0265 0.10646,0.0398 0.0775,0.029 0.15462,0.0585 0.22892,0.0915 0.0165,0.007 0.0323,0.0153 0.0486,0.0227 0.19062,0.0873 0.37216,0.18511 0.54725,0.2899 0.0523,0.0313 0.1016,0.065 0.15296,0.0972 0.13361,0.0838 0.26765,0.16753 0.3974,0.25373 l 2.42362,0.96945 c 5.3e-4,0 0.001,0 0.002,0 l -0.25011,-4.9997 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path75-3" />
+            <path
+               d="m 144.00012,194.99987 h 4.7501 l -0.49971,-9.9999 h -4.25039 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path74-0" />
+            <path
+               d="m 140.00036,194.99987 h -0.99994 v 4.9997 h 5.2e-4 c 6.5e-4,-4.9e-4 0.36733,-0.27592 0.94671,-0.62064 0.3866,-0.23 0.86779,-0.49088 1.39733,-0.72088 0.79432,-0.34502 1.69771,-0.62115 2.5554,-0.62115 0.002,0 0.004,-2e-5 0.006,0 l 0.0935,-0.0372 v -2.99982 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path73-3" />
+            <path
+               d="m 140.00036,191.00012 v 3.99975 h 3.99976 v -9.9999 h -3.99976 z"
+               style="fill:#ebebeb;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
+               id="path71-6" />
+          </g>
           <path
              d="M 139.45466,184.99997 H 138.99991 129 v 4.99969 h 10.90941 z"
              style="fill:#ffffff;fill-opacity:1;stroke:#080d6e;stroke-width:0.3;stroke-opacity:1;paint-order:markers fill stroke"
@@ -4168,61 +4171,6 @@
                style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#c21881;fill-opacity:1;stroke:none;stroke-width:0.4"
                x="42.019508"
                y="38.516991">6</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-size:2.82222px;line-height:1.1;font-family:arial;-inkscape-font-specification:arial;text-align:center;text-anchor:middle;fill:#c21881;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-linejoin:miter;stroke-dasharray:none;paint-order:stroke markers fill"
-             x="43.571632"
-             y="31.203211"
-             id="text20-8-67-1-7"><tspan
-               sodipodi:role="line"
-               id="tspan20-0-8-0-6"
-               style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#c21881;fill-opacity:1;stroke:none;stroke-width:0.4"
-               x="43.571632"
-               y="31.203211">7</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-size:2.82222px;line-height:1.1;font-family:arial;-inkscape-font-specification:arial;text-align:center;text-anchor:middle;fill:#c21881;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-linejoin:miter;stroke-dasharray:none;paint-order:stroke markers fill"
-             x="41.03484"
-             y="23.433743"
-             id="text20-8-3-8-2"><tspan
-               sodipodi:role="line"
-               id="tspan20-0-9-2-5"
-               style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#c21881;fill-opacity:1;stroke:none;stroke-width:0.4"
-               x="41.03484"
-               y="23.433743">8</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-size:2.82222px;line-height:1.1;font-family:arial;-inkscape-font-specification:arial;text-align:center;text-anchor:middle;fill:#c21881;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-linejoin:miter;stroke-dasharray:none;paint-order:stroke markers fill"
-             x="41.375275"
-             y="18.516991"
-             id="text20-8-38-2-5"><tspan
-               sodipodi:role="line"
-               id="tspan20-0-5-2-8"
-               style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#c21881;fill-opacity:1;stroke:none;stroke-width:0.4"
-               x="41.375275"
-               y="18.516991">9</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-size:2.82222px;line-height:1.1;font-family:arial;-inkscape-font-specification:arial;text-align:center;text-anchor:middle;fill:#c21881;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-linejoin:miter;stroke-dasharray:none;paint-order:stroke markers fill"
-             x="32.530102"
-             y="18.199408"
-             id="text20-8-8-1-4"><tspan
-               sodipodi:role="line"
-               id="tspan20-0-6-7-3"
-               style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#c21881;fill-opacity:1;stroke:none;stroke-width:0.4"
-               x="32.530102"
-               y="18.199408">10</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-size:2.82222px;line-height:1.1;font-family:arial;-inkscape-font-specification:arial;text-align:center;text-anchor:middle;fill:#c21881;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-linejoin:miter;stroke-dasharray:none;paint-order:stroke markers fill"
-             x="37.152626"
-             y="18.202852"
-             id="text20-8-8-4-2-2"><tspan
-               sodipodi:role="line"
-               id="tspan20-0-6-1-0-0"
-               style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#c21881;fill-opacity:1;stroke:none;stroke-width:0.4"
-               x="37.152626"
-               y="18.202852">11</tspan></text>
         </g>
         <g
            id="g21-9-8"
@@ -4272,39 +4220,6 @@
                style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#0b8ad9;fill-opacity:1;stroke:none;stroke-width:0.4"
                x="67.579971"
                y="38.475647">12</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-size:2.82222px;line-height:1.1;font-family:arial;-inkscape-font-specification:arial;text-align:center;text-anchor:middle;fill:#0b8ad9;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-linejoin:miter;stroke-dasharray:none;paint-order:stroke markers fill"
-             x="69.015884"
-             y="33.06958"
-             id="text20-8-7-2-4-5-8-3"><tspan
-               sodipodi:role="line"
-               id="tspan20-0-0-5-2-8-5-1"
-               style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#0b8ad9;fill-opacity:1;stroke:none;stroke-width:0.4"
-               x="69.015884"
-               y="33.06958">13</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-size:2.82222px;line-height:1.1;font-family:arial;-inkscape-font-specification:arial;text-align:center;text-anchor:middle;fill:#0b8ad9;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-linejoin:miter;stroke-dasharray:none;paint-order:stroke markers fill"
-             x="72.435684"
-             y="28.530771"
-             id="text20-8-7-2-4-8-3-1"><tspan
-               sodipodi:role="line"
-               id="tspan20-0-0-5-2-9-1-3"
-               style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#0b8ad9;fill-opacity:1;stroke:none;stroke-width:0.4"
-               x="72.435684"
-               y="28.530771">14</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-size:2.82222px;line-height:1.1;font-family:arial;-inkscape-font-specification:arial;text-align:center;text-anchor:middle;fill:#0b8ad9;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-linejoin:miter;stroke-dasharray:none;paint-order:stroke markers fill"
-             x="72.435684"
-             y="18.223522"
-             id="text20-8-7-2-4-7-2-7"><tspan
-               sodipodi:role="line"
-               id="tspan20-0-0-5-2-5-9-5"
-               style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.82222px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#0b8ad9;fill-opacity:1;stroke:none;stroke-width:0.4"
-               x="72.435684"
-               y="18.223522">15</tspan></text>
         </g>
       </g>
     </g>

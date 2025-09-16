@@ -7,8 +7,6 @@ from shapely import LineString, Polygon, MultiPolygon, distance, intersects, min
 from shapely.geometry import box
 from shapely.wkt import loads, dumps
 
-AP_RATIO = 0.2
-
 # Códigos URM em SIRGAS 2000
 UTMCODES = {
     '17S':"EPSG:31977",
@@ -44,12 +42,12 @@ def find_utm_proj(X, Y):
     fuse = f'{f}{h}'
     return UTMCODES[fuse]
 
-def geomIsResidual(geom):
+def geomIsResidual(geom, ref_ap_ratio):
     '''
     Avalia se geometria é espúria
     '''
     ap_ratio = geom.area/geom.length
-    return (ap_ratio < AP_RATIO)
+    return (ap_ratio < ref_ap_ratio)
 
 def removeHoles(geom, area_min=1):
     '''
@@ -182,16 +180,18 @@ def format_corresp(a, b):
             return '1:1'
 
 class compatibility_graph(nx.Graph):
-    def __init__(self, m1, m2):
+    def __init__(self, m1, m2, ap_ratio=0.2):
         '''
         Classe de grafo de compatibilização criado das malhas m1 e m2
         '''
         super().__init__()
+        self.ap_ratio = ap_ratio
         self.m1 = m1
         self.m2 = m2
         self.makeGridUnion()
         self.classifyGridChanges()
         self.setNodes()
+        
 
         # Cria atributos
         self.AMC = None
@@ -201,6 +201,26 @@ class compatibility_graph(nx.Graph):
         self.node_gdf = None
         self.threshold = []
         self.buffer = []
+        self.assess_df = None
+        self.scores = None
+        self.assessed = False
+
+    def reset(self, ap_ratio=0.2):
+        self.clear()
+        self.setNodes()
+        self.ap_ratio = ap_ratio
+
+        # Reseta atributos
+        self.AMC = None
+        self.compatTable_A = None
+        self.compatTable_B = None
+        self.edge_gdf = None
+        self.node_gdf = None
+        self.threshold = []
+        self.buffer = []
+        self.assess_df = None
+        self.scores = None
+        self.assessed = False
 
     def _classifyIdChanges(self):
         '''
@@ -294,7 +314,7 @@ class compatibility_graph(nx.Graph):
         # Interseção e tratamento para exclusão de geometrias residuais
         self.gridUnion = gpd.overlay(gA, gB, how='union')\
                         .dropna(subset=['A.ID', 'B.ID'])
-        self.gridUnion['RESIDUAL'] = self.gridUnion['geometry'].apply(geomIsResidual)
+        self.gridUnion['RESIDUAL'] = self.gridUnion['geometry'].apply(lambda x: geomIsResidual(x, self.ap_ratio))
         self.gridUnion['UNION_AREA'] = self.gridUnion.area
 
         # Indicadores de área de interseção
@@ -367,7 +387,7 @@ class compatibility_graph(nx.Graph):
         # Interseção
         intersecao = gpd.overlay(isolados_A, buffered_B, how='union')\
                         .dropna(subset=['A.ID', 'ID'])
-        intersecao['RESIDUAL'] = intersecao['geometry'].apply(geomIsResidual)
+        intersecao['RESIDUAL'] = intersecao['geometry'].apply(lambda x: geomIsResidual(x, self.ap_ratio))
         for _, row in intersecao.query('RESIDUAL == False').iterrows():
             self.add_edge(f"A.{row['A.ID']}",
                             f"B.{row['ID']}",
@@ -388,7 +408,7 @@ class compatibility_graph(nx.Graph):
         # Interseção
         intersecao = gpd.overlay(isolados_B, buffered_A, how='union')\
                         .dropna(subset=['ID', 'B.ID'])
-        intersecao['RESIDUAL'] = intersecao['geometry'].apply(geomIsResidual)
+        intersecao['RESIDUAL'] = intersecao['geometry'].apply(lambda x: geomIsResidual(x, self.ap_ratio))
         for _, row in intersecao.query('RESIDUAL == False').iterrows():
             self.add_edge(f"A.{row['ID']}",
                             f"B.{row['B.ID']}",
@@ -438,6 +458,42 @@ class compatibility_graph(nx.Graph):
         df_matriz_B = pd.DataFrame(matriz_B)
         self.compatTable_B = df_matriz_B.explode('ID')
 
+    def assessEdges(self, ground_truth_graph):
+        '''
+        Avalia grafo gerado com um grafo contendo as verdadeiras correspondências
+        '''
+        # Operações entre grafos
+        symdiff = nx.symmetric_difference(ground_truth_graph, self)
+        false_neg = nx.difference(ground_truth_graph, self)
+        true_pos = nx.intersection(ground_truth_graph, self)
+        false_pos = nx.difference(symdiff, ground_truth_graph)
+
+        # Cria df de avaliação
+        self.assess_df = pd.DataFrame([{'u':i, 'v':j} for i, j in list(true_pos.edges())])
+        self.assess_df['assessment'] = 'true positive'
+
+        df_fp = pd.DataFrame([{'u':i, 'v':j} for i, j in list(false_pos.edges())])
+        self.assess_df = pd.concat([self.assess_df, df_fp])
+        self.assess_df['assessment'] = self.assess_df['assessment'].fillna('false positive')
+
+        df_fn = pd.DataFrame([{'u':i, 'v':j} for i, j in list(false_neg.edges())])
+        self.assess_df = pd.concat([self.assess_df, df_fn])
+        self.assess_df['assessment'] = self.assess_df['assessment'].fillna('false negative')
+
+        # Cálculo pontuação
+        recall = len(true_pos.edges())/(len(true_pos.edges())+len(false_neg.edges()))
+        precision = len(true_pos.edges())/len(self.edges)
+        f1_score = 2/((recall**-1) + (precision**-1))
+        self.scores = {
+            'true positives':len(true_pos.edges()),
+            'false positives':len(false_pos.edges()),
+            'false negatives':len(false_neg.edges()),
+            'recall':recall,
+            'precision':precision,
+            'f1_score':f1_score
+        }
+        self.assessed = True
+
     def _prepareExport(self):
         '''
         Cria tabelas de exportação
@@ -472,18 +528,38 @@ class compatibility_graph(nx.Graph):
         '''
         # Arestas
         edge_data = []
-        for u, v in list(self.edges):
+        if self.assessed:
+            # Adiciona dados de avaliação do grafo e cria arestas provisórias
+            for _, r in self.assess_df.iterrows():
+                if self.has_edge(r['u'], r['v']):
+                    self[r['u']][r['v']].update({'assessment':r['assessment']})
+                else:
+                    self.add_edge(r['u'], r['v'], data={'metodo':'', 'assessment':'false negative'})
+
+        # Organiza dados das arestas
+        for u, v, edge_dic in list(self.edges(data=True)):
             data_u = self.nodes[u]
             data_u = {f"{data_u['malha']}.{k}":value for k, value in data_u.items()}
             data_v = self.nodes[v]
             data_v = {f"{data_v['malha']}.{k}":value for k, value in data_v.items()}
             data_u.update(data_v)
-            data_u.update(self.edges[(u, v)])
+            data_u.update(edge_dic)
             data_u['geometry'] = LineString([data_u['A.center'], data_u['B.center']])
             edge_data.append(data_u)
 
         edge_gdf = gpd.GeoDataFrame(edge_data, geometry='geometry', crs=self.m2.crs)
-        self.edge_gdf = edge_gdf[['A.nome', 'A.classe', 'B.nome', 'B.classe', 'metodo', 'geometry']]
+
+        if self.assessed:
+            self.edge_gdf = edge_gdf[['A.nome', 'A.classe', 'B.nome', 'B.classe', 'metodo', 'assessment', 'geometry']]
+
+            # Remover arestas provsórias
+            edges_to_remove = []
+            for u, v, data in self.edges(data=True):
+                if data.get('assessment') == 'false negative':  # Example: remove edges with type 'path'
+                    edges_to_remove.append((u, v))
+            self.remove_edges_from(edges_to_remove)
+        else:
+            self.edge_gdf = edge_gdf[['A.nome', 'A.classe', 'B.nome', 'B.classe', 'metodo', 'geometry']]
        
         # Nós
         node_data = [i for _, i in list(self.nodes.data())]
@@ -492,7 +568,7 @@ class compatibility_graph(nx.Graph):
         node_gdf = gpd.GeoDataFrame(node_data, geometry='center', crs=self.m2.crs)
         self.node_gdf = node_gdf[['nome', 'malha', 'classe', 'group', 'grau', 'center']]
     
-    def exportCompatFiles(self, compatName, name_C1, name_C2):
+    def exportCompatFiles(self, compatName, name_C1, name_C2, save_files=True):
         '''
         Exporta os arquivos de compatibilização
         '''
@@ -500,16 +576,18 @@ class compatibility_graph(nx.Graph):
         self._prepareGraphExport()
         self.compatTable_A[['ID', 'CD_PERIMETRO']].to_csv(f'malhas/{compatName}_{name_C1}.csv', sep='\t', index=False)
         self.compatTable_B[['ID', 'CD_PERIMETRO']].to_csv(f'malhas/{compatName}_{name_C2}.csv', sep='\t', index=False)
-        self.AMC.to_file(f'malhas/{compatName}_AMC.gpkg',
-                         layer=f'{name_C1}-{name_C2}',
-                         driver='GPKG')
-        # Exportar representação geográfica do grafo
-        self.edge_gdf.to_file(f'malhas/{compatName}_AMC.gpkg',
-                            layer=f'{name_C1}-{name_C2}_edges',
+
+        if save_files:
+            self.AMC.to_file(f'malhas/{compatName}_AMC.gpkg',
+                            layer=f'{name_C1}-{name_C2}',
                             driver='GPKG')
-        self.node_gdf.to_file(f'malhas/{compatName}_AMC.gpkg',
-                            layer=f'{name_C1}-{name_C2}_nodes',
-                            driver='GPKG')
+            # Exportar representação geográfica do grafo
+            self.edge_gdf.to_file(f'malhas/{compatName}_AMC.gpkg',
+                                layer=f'{name_C1}-{name_C2}_edges',
+                                driver='GPKG')
+            self.node_gdf.to_file(f'malhas/{compatName}_AMC.gpkg',
+                                layer=f'{name_C1}-{name_C2}_nodes',
+                                driver='GPKG')
 
     def reportCompat(self, file=None):
         '''
@@ -551,7 +629,7 @@ class compatibility_graph(nx.Graph):
         # Estruturação do relatório
         dic = {
             'parametros':{
-                'razão A/P': AP_RATIO,
+                'razão A/P': self.ap_ratio,
                 'Limite base de sobreposicao (L)': self.threshold,
                 'Buffers': self.buffer
             },
@@ -573,6 +651,10 @@ class compatibility_graph(nx.Graph):
                 'Redesenhos extensos':{'n':rdex, 'pct':pct_rdex},
             }
         }
+
+        # Atualiza com dados de avaliação
+        if self.assessed:
+            dic.update({'avaliacao':self.scores})
 
         # Adiciona informações de pivot_tables
         dic['correspondencias'].update(edge_data)
