@@ -65,7 +65,7 @@ def removeHoles(geom, area_min=1):
         out_polys.append(Polygon(part.exterior.coords, holes=interiors))
     return MultiPolygon(out_polys) if len(out_polys)>1 else out_polys[0]
 
-def makeCensusGrid(gpkg_file, id_column, layer=None, mun_filter=[]):
+def makeCensusGrid(gpkg_file, id_column, layer=None, mun_filter=[], len_higher_hierarchy=11):
     '''
     Importa malha de setores e a configura
     '''
@@ -82,7 +82,7 @@ def makeCensusGrid(gpkg_file, id_column, layer=None, mun_filter=[]):
     gdf['geometry'] = gdf['geometry'].make_valid()
 
     # Campo de grupo a partir da estrutura do id
-    gdf['GROUP'] = gdf['ID'].apply(lambda x: str(x)[:11])
+    gdf['GROUP'] = gdf['ID'].apply(lambda x: str(x)[:len_higher_hierarchy])
 
     # Reprojetar camada
     Y = (gdf.total_bounds[1] + gdf.total_bounds[3])/2
@@ -378,20 +378,21 @@ class compatibility_graph(nx.Graph):
         isolados_A = isolados_A.rename(columns={k:f'A.{k}' for k in isolados_A.columns})
         isolados_A['A.geometry'] = isolados_A['A.geometry'].buffer(buffer)
         isolados_A = isolados_A.set_geometry('A.geometry', crs=self.m1.crs)
-        if not use_all:
-            buffered_B = self.m2.query('CLASS != "Manutenção"')
-        else:
-            buffered_B = self.m2.copy()
-        buffered_B['B.geometry'] = buffered_B['geometry'].buffer(buffer)
-        buffered_B = buffered_B.set_geometry('B.geometry', crs=self.m2.crs)
-        # Interseção
-        intersecao = gpd.overlay(isolados_A, buffered_B, how='union')\
-                        .dropna(subset=['A.ID', 'ID'])
-        intersecao['RESIDUAL'] = intersecao['geometry'].apply(lambda x: geomIsResidual(x, self.ap_ratio))
-        for _, row in intersecao.query('RESIDUAL == False').iterrows():
-            self.add_edge(f"A.{row['A.ID']}",
-                            f"B.{row['ID']}",
-                            metodo=f'Sobreposição ({buffer}m)')
+        if len(isolados_A) > 0:
+            if not use_all:
+                buffered_B = self.m2.query('CLASS != "Manutenção"')
+            else:
+                buffered_B = self.m2.copy()
+            buffered_B['B.geometry'] = buffered_B['geometry'].buffer(buffer)
+            buffered_B = buffered_B.set_geometry('B.geometry', crs=self.m2.crs)
+            # Interseção
+            intersecao = gpd.overlay(isolados_A, buffered_B, how='union')\
+                            .dropna(subset=['A.ID', 'ID'])
+            intersecao['RESIDUAL'] = intersecao['geometry'].apply(lambda x: geomIsResidual(x, self.ap_ratio))
+            for _, row in intersecao.query('RESIDUAL == False').iterrows():
+                self.add_edge(f"A.{row['A.ID']}",
+                                f"B.{row['ID']}",
+                                metodo=f'Sobreposição ({buffer}m)')
 
         # Selecionar setores ainda não vinculados
         list_isolados_B = [i.split('.')[-1] for i in list_isolados if i.startswith('B.')]
@@ -399,20 +400,21 @@ class compatibility_graph(nx.Graph):
         isolados_B = isolados_B.rename(columns={k:f'B.{k}' for k in isolados_B.columns})
         isolados_B['B.geometry'] = isolados_B['B.geometry'].buffer(buffer)
         isolados_B = isolados_B.set_geometry('B.geometry', crs=self.m2.crs)
-        if not use_all:
-            buffered_A = self.m1.query('CLASS != "Manutenção"')
-        else:
-            buffered_A = self.m1.copy()
-        buffered_A['A.geometry'] = buffered_A['geometry'].buffer(buffer)
-        buffered_A = buffered_A.set_geometry('A.geometry', crs=self.m1.crs)
-        # Interseção
-        intersecao = gpd.overlay(isolados_B, buffered_A, how='union')\
-                        .dropna(subset=['ID', 'B.ID'])
-        intersecao['RESIDUAL'] = intersecao['geometry'].apply(lambda x: geomIsResidual(x, self.ap_ratio))
-        for _, row in intersecao.query('RESIDUAL == False').iterrows():
-            self.add_edge(f"A.{row['ID']}",
-                            f"B.{row['B.ID']}",
-                            metodo=f'Sobreposição ({buffer}m)')
+        if len(isolados_B) > 0:
+            if not use_all:
+                buffered_A = self.m1.query('CLASS != "Manutenção"')
+            else:
+                buffered_A = self.m1.copy()
+            buffered_A['A.geometry'] = buffered_A['geometry'].buffer(buffer)
+            buffered_A = buffered_A.set_geometry('A.geometry', crs=self.m1.crs)
+            # Interseção
+            intersecao = gpd.overlay(isolados_B, buffered_A, how='union')\
+                            .dropna(subset=['ID', 'B.ID'])
+            intersecao['RESIDUAL'] = intersecao['geometry'].apply(lambda x: geomIsResidual(x, self.ap_ratio))
+            for _, row in intersecao.query('RESIDUAL == False').iterrows():
+                self.add_edge(f"A.{row['ID']}",
+                                f"B.{row['B.ID']}",
+                                metodo=f'Sobreposição ({buffer}m)')
             
         self.buffer.append({'buffer':buffer, 'use_all':use_all})
         self.clearGroups()
@@ -433,30 +435,6 @@ class compatibility_graph(nx.Graph):
             if not all([e in to_remove for e in self.edges(u)]) and not all([e in to_remove for e in self.edges(v)]):
                 self.remove_edge(u,v)
 
-    def _codifyCompat(self):
-        '''
-        Codifica as componentes do grafo resultante
-        '''
-        componentes = [{'group':self.nodes[list(G)[0]]['group'], 'nodes':list(G)}\
-               for G in nx.connected_components(self)]
-        increment_id = {k['group']:0 for k in componentes}
-
-        matriz_A = []
-        matriz_B = []
-        for c in componentes:
-            increment_id[c['group']] += 1
-            cod_c = f"{c['group']}{increment_id[c['group']]:05d}"
-
-            c_A = [self.nodes[i]['nome'] for i in c['nodes'] if self.nodes[i]['malha']=='A']
-            matriz_A.append({'CD_PERIMETRO':cod_c, 'ID':c_A})
-            c_B = [self.nodes[i]['nome'] for i in c['nodes'] if self.nodes[i]['malha']=='B']
-            matriz_B.append({'CD_PERIMETRO':cod_c, 'ID':c_B})
-
-        # Criação dos DataFrames finais
-        df_matriz_A = pd.DataFrame(matriz_A)
-        self.compatTable_A = df_matriz_A.explode('ID')
-        df_matriz_B = pd.DataFrame(matriz_B)
-        self.compatTable_B = df_matriz_B.explode('ID')
 
     def assessEdges(self, ground_truth_graph):
         '''
@@ -494,7 +472,34 @@ class compatibility_graph(nx.Graph):
         }
         self.assessed = True
 
-    def _prepareExport(self):
+
+    def _codifyCompat(self):
+        '''
+        Codifica as componentes do grafo resultante
+        '''
+        componentes = [{'group':self.nodes[list(G)[0]]['group'], 'nodes':list(G)}\
+               for G in nx.connected_components(self)]
+        increment_id = {k['group']:0 for k in componentes}
+
+        matriz_A = []
+        matriz_B = []
+        for c in componentes:
+            increment_id[c['group']] += 1
+            cod_c = f"{c['group']}{increment_id[c['group']]:05d}"
+
+            c_A = [self.nodes[i]['nome'] for i in c['nodes'] if self.nodes[i]['malha']=='A']
+            matriz_A.append({'CD_PERIMETRO':cod_c, 'ID':c_A})
+            c_B = [self.nodes[i]['nome'] for i in c['nodes'] if self.nodes[i]['malha']=='B']
+            matriz_B.append({'CD_PERIMETRO':cod_c, 'ID':c_B})
+
+        # Criação dos DataFrames finais
+        df_matriz_A = pd.DataFrame(matriz_A)
+        self.compatTable_A = df_matriz_A.explode('ID')
+        df_matriz_B = pd.DataFrame(matriz_B)
+        self.compatTable_B = df_matriz_B.explode('ID')
+
+
+    def _prepareExport(self, amc_base='B'):
         '''
         Cria tabelas de exportação
         '''
@@ -512,9 +517,14 @@ class compatibility_graph(nx.Graph):
         # Agregação dos dados
         data_matrizes = data_matriz_A.merge(data_matriz_B, on='CD_PERIMETRO')
         data_matrizes['membros'] = data_matrizes['membros_A'] + data_matrizes['membros_B']
-        gdf_pc = self.compatTable_B.merge(self.m2, on='ID')
+        if amc_base=='A':
+            gdf_pc = self.compatTable_A.merge(self.m1, on='ID')
+        else:
+            gdf_pc = self.compatTable_B.merge(self.m2, on='ID')
         gdf_pc = gdf_pc.merge(data_matrizes, on='CD_PERIMETRO')
-        gdf_pc = gpd.GeoDataFrame(gdf_pc, geometry='geometry', crs=self.m2.crs)
+        gdf_pc = gpd.GeoDataFrame(gdf_pc, 
+                                  geometry='geometry', 
+                                  crs=self.m1.crs if amc_base=='A' else self.m2.crs)
         gdf_pc = gdf_pc[['CD_PERIMETRO', 'GROUP', 'membros', 'membros_A', 'membros_B', 'geometry']].dissolve(by='CD_PERIMETRO')
         gdf_pc = gdf_pc.rename(columns={'GROUP':'CD_DIST'})
         gdf_pc['CD_MUN'] = gdf_pc['CD_DIST'].apply(lambda x: x[:7])
@@ -532,9 +542,9 @@ class compatibility_graph(nx.Graph):
             # Adiciona dados de avaliação do grafo e cria arestas provisórias
             for _, r in self.assess_df.iterrows():
                 if self.has_edge(r['u'], r['v']):
-                    self[r['u']][r['v']].update({'assessment':r['assessment']})
+                    self[r['u']][r['v']].update({'assessment': r['assessment']})
                 else:
-                    self.add_edge(r['u'], r['v'], data={'metodo':'', 'assessment':'false negative'})
+                    self.add_edge(r['u'], r['v'], metodo='', assessment='false negative')
 
         # Organiza dados das arestas
         for u, v, edge_dic in list(self.edges(data=True)):
@@ -555,7 +565,7 @@ class compatibility_graph(nx.Graph):
             # Remover arestas provsórias
             edges_to_remove = []
             for u, v, data in self.edges(data=True):
-                if data.get('assessment') == 'false negative':  # Example: remove edges with type 'path'
+                if data.get('assessment') == 'false negative': 
                     edges_to_remove.append((u, v))
             self.remove_edges_from(edges_to_remove)
         else:
@@ -568,11 +578,11 @@ class compatibility_graph(nx.Graph):
         node_gdf = gpd.GeoDataFrame(node_data, geometry='center', crs=self.m2.crs)
         self.node_gdf = node_gdf[['nome', 'malha', 'classe', 'group', 'grau', 'center']]
     
-    def exportCompatFiles(self, compatName, name_C1, name_C2, save_files=True):
+    def exportCompatFiles(self, compatName, name_C1, name_C2, save_files=True, amc_base='B'):
         '''
         Exporta os arquivos de compatibilização
         '''
-        self._prepareExport()
+        self._prepareExport(amc_base=amc_base)
         self._prepareGraphExport()
         self.compatTable_A[['ID', 'CD_PERIMETRO']].to_csv(f'malhas/{compatName}_{name_C1}.csv', sep='\t', index=False)
         self.compatTable_B[['ID', 'CD_PERIMETRO']].to_csv(f'malhas/{compatName}_{name_C2}.csv', sep='\t', index=False)
@@ -597,6 +607,7 @@ class compatibility_graph(nx.Graph):
         mincs = len(self.node_gdf.query('classe == "Manutenção" & grau > 1'))
         pct_mincs = mincs/len(self.node_gdf.query('classe == "Manutenção"'))
 
+
         # Isolados persistentes
         df = (self.edge_gdf.merge(self.compatTable_B, left_on='B.nome', right_on='ID', how='left')
                            .merge(self.AMC.reset_index()[['CD_PERIMETRO', 'TIPO_CORRESP']], on='CD_PERIMETRO', how='left' ))
@@ -604,10 +615,14 @@ class compatibility_graph(nx.Graph):
         pct_ips = ips/len(self.node_gdf)
         
         # Razão de divisões não puras
-        df = df.pivot_table(index='TIPO_CORRESP', columns='metodo', values='B.nome', aggfunc='count')
-        dnp = float(df.loc['m:n','Divisão'])
-        pct_dnp = float(dnp/df['Divisão'].sum())
-
+        try:
+            df = df.pivot_table(index='TIPO_CORRESP', columns='metodo', values='B.nome', aggfunc='count')
+            dnp = float(df.loc['m:n','Divisão'])
+            pct_dnp = float(dnp/df['Divisão'].sum())
+        except:
+            dnp = None
+            pct_dnp = None
+        
         # Desconexos
         dcxs = len(self.node_gdf.query('grau == 0'))
         pct_dcxs = dcxs/len(self.node_gdf)
