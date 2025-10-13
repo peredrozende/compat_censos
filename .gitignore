@@ -1,2 +1,4 @@
 ibge/Setores IBGE.gpkg
+us_census_ny/*.gpkg
+conicet/*.gpkg
 malhas/parametros/old

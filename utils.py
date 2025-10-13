@@ -8,7 +8,7 @@ from shapely.geometry import box
 from shapely.wkt import loads, dumps
 
 # Códigos URM em SIRGAS 2000
-UTMCODES = {
+UTMCODES_SIRGAS2000 = {
     '17S':"EPSG:31977",
     '18S':"EPSG:31978",
     '19S':"EPSG:31979",
@@ -28,19 +28,27 @@ UTMCODES = {
     '24N':"EPSG:6211"
     }
 
-def find_utm_proj(X, Y):
+# Códigos URM em WGS84
+UTMCODES_WGS84 = {
+    **{f"{zone:02d}N": f"EPSG:{32600 + zone}" for zone in range(1, 61)},
+    **{f"{zone:02d}S": f"EPSG:{32700 + zone}" for zone in range(1, 61)}
+}
+
+def find_utm_proj(X, Y, geosystem='WGS84'):
     '''
-    Identifica projeção local UTM em SIRGAS 2000
+    Identifica projeção local UTM
     '''
+    assert geosystem in ['WGS84','SIRGAS2000']
     # Hemisfério
     h = 'N' if Y > 0 else 'S'
     # Fuso
-    if -84 <= X < -30: # Ponto dentro do intervalo do Brasil
-        f = int((X//6) + 31)
+    f = int((X//6) + 31)
+    fuse = f'{f:02d}{h}'
+
+    if geosystem=='SIRGAS2000':
+        return UTMCODES_SIRGAS2000[fuse]
     else:
-        f = ''
-    fuse = f'{f}{h}'
-    return UTMCODES[fuse]
+        return UTMCODES_WGS84[fuse]
 
 def geomIsResidual(geom, ref_ap_ratio):
     '''
@@ -65,15 +73,19 @@ def removeHoles(geom, area_min=1):
         out_polys.append(Polygon(part.exterior.coords, holes=interiors))
     return MultiPolygon(out_polys) if len(out_polys)>1 else out_polys[0]
 
-def makeCensusGrid(gpkg_file, id_column, layer=None, mun_filter=[], len_higher_hierarchy=11):
+def makeCensusGrid(gpkg_file, id_column, layer=None, filter=[], len_higher_hierarchy=11, geosys=None):
     '''
     Importa malha de setores e a configura
     '''
+    if filter:
+        filter_len = len(filter[0])
+        assert all([len(i)==filter_len for i in filter])
+        
     gdf = gpd.read_file(gpkg_file, layer=layer)[[id_column, 'geometry']]
     gdf = gdf.rename(columns={id_column:'ID'})
     gdf['ID'] = gdf['ID'].astype(str)
-    if mun_filter:
-        gdf = gdf[gdf['ID'].apply(lambda x: x[:7] in mun_filter)]
+    if filter:
+        gdf = gdf[gdf['ID'].apply(lambda x: x[:filter_len] in filter)]
 
     # Remoção de sufixos literais
     gdf['ID'] = gdf['ID'].apply(lambda x: ''.join([i for i in str(x) if i.isdigit()]))
@@ -87,7 +99,10 @@ def makeCensusGrid(gpkg_file, id_column, layer=None, mun_filter=[], len_higher_h
     # Reprojetar camada
     Y = (gdf.total_bounds[1] + gdf.total_bounds[3])/2
     X = (gdf.total_bounds[0] + gdf.total_bounds[2])/2
-    UTMCRS = find_utm_proj(X, Y)
+    if geosys:
+        UTMCRS = find_utm_proj(X, Y, geosys)
+    else:
+        UTMCRS = find_utm_proj(X, Y)
     gdf = gdf.to_crs(UTMCRS)
 
     # Calcular vizinhos
@@ -605,7 +620,11 @@ class compatibility_graph(nx.Graph):
         '''
         # Manutenções inconsistentes
         mincs = len(self.node_gdf.query('classe == "Manutenção" & grau > 1'))
-        pct_mincs = mincs/len(self.node_gdf.query('classe == "Manutenção"'))
+        manutencoes = len(self.node_gdf.query('classe == "Manutenção"'))
+        if manutencoes:
+            pct_mincs = mincs/manutencoes
+        else:
+            pct_mincs = None
 
 
         # Isolados persistentes
