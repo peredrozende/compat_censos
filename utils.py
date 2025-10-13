@@ -73,7 +73,7 @@ def removeHoles(geom, area_min=1):
         out_polys.append(Polygon(part.exterior.coords, holes=interiors))
     return MultiPolygon(out_polys) if len(out_polys)>1 else out_polys[0]
 
-def makeCensusGrid(gpkg_file, id_column, layer=None, filter=[], len_higher_hierarchy=11, geosys=None):
+def makeCensusGrid(gpkg_file, id_column, layer=None, filter=[], len_higher_hierarchy=11, is_utm=False, geosys=None):
     '''
     Importa malha de setores e a configura
     '''
@@ -99,11 +99,13 @@ def makeCensusGrid(gpkg_file, id_column, layer=None, filter=[], len_higher_hiera
     # Reprojetar camada
     Y = (gdf.total_bounds[1] + gdf.total_bounds[3])/2
     X = (gdf.total_bounds[0] + gdf.total_bounds[2])/2
-    if geosys:
-        UTMCRS = find_utm_proj(X, Y, geosys)
-    else:
-        UTMCRS = find_utm_proj(X, Y)
-    gdf = gdf.to_crs(UTMCRS)
+
+    if not is_utm:
+        if geosys:
+            UTMCRS = find_utm_proj(X, Y, geosys)
+        else:
+            UTMCRS = find_utm_proj(X, Y)
+        gdf = gdf.to_crs(UTMCRS)
 
     # Calcular vizinhos
     gdf['NEIGHBOR'] = gdf.apply(lambda x: getNeighbors(x, gdf), axis=1)
@@ -370,7 +372,7 @@ class compatibility_graph(nx.Graph):
         intersecao = self.gridUnion.query('`A.CLASS` != "Manutenção" | `B.CLASS` != "Manutenção"')
 
         # Caso setores desassociados com interseção tenham o mesmo id
-        for s in intersecao.query('`A.ID` == `B.ID`')['B.ID']:
+        for s in intersecao.query('`A.ID` == `B.ID` & `B.PCT_AREA` >= @threshold')['B.ID']:
             self.add_edge(f"A.{s}", f"B.{s}", metodo='Manutenção desassociada')
 
         # Registrar divisão (>=threshold da área original de B em um único setor de A)
