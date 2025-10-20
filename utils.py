@@ -730,33 +730,47 @@ class comparability_graph(nx.Graph):
 
         return dic
     
-def readMetrics(basename, param, dir='results/params', agg='n', assessed=True):
+def _readMetrics(param, dir, agg, assessed):
     '''
     Reads metrics from report files
     '''
     assert param in ['apr', 'lmin']
     assert agg in ['n', 'pct']
+
     param_name = 'A/P ratio' if param=='apr' else 'Lmin'
+    param_files = [i for i in os.listdir(dir) if param in i]
+    multiplier = 100 if agg=='pct' else 1
 
-    # Read metrics
-    ap_files = [f'{dir}/{i}' for i in os.listdir(dir) if f'{basename}_{param}' in i]
-    datalist = []
-    for file in ap_files:
-        with open(file, 'r') as f:
-            datalist.append(json.load(f))
+    df = pd.DataFrame()
+    
+    for file in param_files:
+        with open(f'{dir}/{file}' , 'r') as f:
+            datalist = [json.load(f)]
 
-    d = [{param_name: x['params'][param_name]} for x in datalist]
-    d = [{**i, **j} for i,j in zip(d,[{k:v[agg] for k,v in x['metrics'].items()} for x in datalist])]
-    df_param = pd.DataFrame(d)
-
-    if assessed:
         d = [{param_name: x['params'][param_name]} for x in datalist]
-        d = [{**i, **j} for i,j in zip(d,[{k:v for k,v in x['assessment'].items()} for x in datalist])]
-        df_param = df_param.merge(pd.DataFrame(d)[[param_name, 'recall', 'precision', 'f1_score']], on=param_name, how='left')
-        for c in ['recall', 'precision', 'f1_score']:
-            df_param[c] = df_param[c]*1000
+        d = [{**i, **j} for i,j in zip(d,[{k:v[agg]*multiplier for k,v in x['metrics'].items()} for x in datalist])]
+        df_param = pd.DataFrame(d)
 
-    if param == 'lmin':
-        df_param = df_param.explode('Lmin')
+        if param == 'lmin':
+            df_param = df_param.explode('Lmin')
 
-    return df_param
+        if assessed:
+            d = [{param_name: x['params'][param_name]} for x in datalist]
+            d = [{**i, **j} for i,j in zip(d,[{k:v for k,v in x['assessment'].items()} for x in datalist])]
+            df_assess = pd.DataFrame(d)[[param_name, 'recall', 'precision', 'f1_score']]
+            if param == 'lmin':
+                df_assess = df_assess.explode('Lmin')
+            df_param = df_param.merge(df_assess, on=param_name, how='left')
+            for c in ['recall', 'precision', 'f1_score']:
+                df_param[c] = df_param[c]*100
+        df_param['file']=file
+        df_param['agg']=agg
+        
+        df = pd.concat([df, df_param])
+
+    return df
+
+def readReports(param, dir='results/params', assessed=True):
+    df1 = _readMetrics(param, dir, agg='n', assessed=assessed)
+    df2 = _readMetrics(param, dir, agg='pct', assessed=assessed)
+    return pd.concat([df1, df2])
