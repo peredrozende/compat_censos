@@ -1,4 +1,5 @@
-ibge/Setores IBGE.gpkg
-us_census_ny/*.gpkg
-conicet/*.gpkg
-malhas/parametros/old
+resources/ibge/Setores IBGE.gpkg
+resources/us_census_ny/*.gpkg
+resources/conicet/*.gpkg
+trash
+old
