@@ -478,15 +478,15 @@ class comparability_graph(nx.Graph):
                 self.remove_edge(u,v)
 
     @timer
-    def assessEdges(self, ground_truth_graph):
+    def assessEdges(self, gold_graph):
         '''
         Avalia grafo gerado com um grafo contendo as verdadeiras correspondências
         '''
         # Operações entre grafos
-        symdiff = nx.symmetric_difference(ground_truth_graph, self)
-        false_neg = nx.difference(ground_truth_graph, self)
-        true_pos = nx.intersection(ground_truth_graph, self)
-        false_pos = nx.difference(symdiff, ground_truth_graph)
+        symdiff = nx.symmetric_difference(gold_graph, self)
+        false_neg = nx.difference(gold_graph, self)
+        true_pos = nx.intersection(gold_graph, self)
+        false_pos = nx.difference(symdiff, gold_graph)
 
         # Cria df de avaliação
         self.assess_df = pd.DataFrame([{'u':i, 'v':j} for i, j in list(true_pos.edges())])
@@ -730,7 +730,7 @@ class comparability_graph(nx.Graph):
 
         return dic
     
-def _readMetrics(param, dir, agg, assessed):
+def _readTestMetrics(param, dir, agg, assessed):
     '''
     Reads metrics from report files
     '''
@@ -770,7 +770,33 @@ def _readMetrics(param, dir, agg, assessed):
 
     return df
 
-def readReports(param, dir='results/params', assessed=True):
-    df1 = _readMetrics(param, dir, agg='n', assessed=assessed)
-    df2 = _readMetrics(param, dir, agg='pct', assessed=assessed)
+def readTestReports(param, dir='results/params', assessed=True):
+    df1 = _readTestMetrics(param, dir, agg='n', assessed=assessed)
+    df2 = _readTestMetrics(param, dir, agg='pct', assessed=assessed)
     return pd.concat([df1, df2])
+
+def readReports(dir='results', assessed=True):
+    '''
+    Reads metrics from report files
+    '''
+    param_files = [i for i in os.listdir(dir) if 'report.json' in i]
+
+    outdata = []
+    
+    for file in param_files:
+        with open(f'{dir}/{file}' , 'r') as f:
+            data = json.load(f)
+
+        d = data['layers']
+        for g in ['relationships', 'operations', 'metrics']:
+            d.update({f'{k}_{'n'}':v['n'] for k,v in data[g].items()})
+            d.update({f'{k}_{'pct'}':v['pct']*100 for k,v in data[g].items()})
+        
+        if assessed:
+            d.update(data['assessment'])
+            for i in ['recall', 'precision', 'f1_score']:
+                d[i]=d[i]*100
+        d['file']=file
+        outdata.append(d)
+
+    return pd.DataFrame(outdata)
