@@ -478,15 +478,15 @@ class comparability_graph(nx.Graph):
                 self.remove_edge(u,v)
 
     @timer
-    def assessEdges(self, gold_graph):
+    def assessEdges(self, ground_truth_graph):
         '''
         Avalia grafo gerado com um grafo contendo as verdadeiras correspondências
         '''
         # Operações entre grafos
-        symdiff = nx.symmetric_difference(gold_graph, self)
-        false_neg = nx.difference(gold_graph, self)
-        true_pos = nx.intersection(gold_graph, self)
-        false_pos = nx.difference(symdiff, gold_graph)
+        symdiff = nx.symmetric_difference(ground_truth_graph, self)
+        false_neg = nx.difference(ground_truth_graph, self)
+        true_pos = nx.intersection(ground_truth_graph, self)
+        false_pos = nx.difference(symdiff, ground_truth_graph)
 
         # Cria df de avaliação
         self.assess_df = pd.DataFrame([{'u':i, 'v':j} for i, j in list(true_pos.edges())])
@@ -621,7 +621,7 @@ class comparability_graph(nx.Graph):
         self.node_gdf = node_gdf[['nome', 'malha', 'classe', 'group', 'grau', 'center']]
 
     @timer
-    def exportCompatFiles(self, compatName, name_C1, name_C2, save_files=True, mca_base='B', dir='results'):
+    def exportCompatFiles(self, compatName, name_C1, name_C2, mca_base='B', dir='results'):
         '''
         Exporta os arquivos de compatibilização
         '''
@@ -630,17 +630,16 @@ class comparability_graph(nx.Graph):
         self.compatTable_A[['ID', 'CD_MCA']].to_csv(f'{dir}/{compatName}_{name_C1}.csv', sep='\t', index=False)
         self.compatTable_B[['ID', 'CD_MCA']].to_csv(f'{dir}/{compatName}_{name_C2}.csv', sep='\t', index=False)
 
-        if save_files:
-            self.MCA.to_file(f'{dir}/{compatName}_MCA.gpkg',
-                            layer=f'{name_C1}-{name_C2}',
+        self.MCA.to_file(f'{dir}/{compatName}_MCA.gpkg',
+                        layer=f'{name_C1}-{name_C2}',
+                        driver='GPKG')
+        # Exportar representação geográfica do grafo
+        self.edge_gdf.to_file(f'{dir}/{compatName}_MCA.gpkg',
+                            layer=f'{name_C1}-{name_C2}_edges',
                             driver='GPKG')
-            # Exportar representação geográfica do grafo
-            self.edge_gdf.to_file(f'{dir}/{compatName}_MCA.gpkg',
-                                layer=f'{name_C1}-{name_C2}_edges',
-                                driver='GPKG')
-            self.node_gdf.to_file(f'{dir}/{compatName}_MCA.gpkg',
-                                layer=f'{name_C1}-{name_C2}_nodes',
-                                driver='GPKG')
+        self.node_gdf.to_file(f'{dir}/{compatName}_MCA.gpkg',
+                            layer=f'{name_C1}-{name_C2}_nodes',
+                            driver='GPKG')
 
     @timer
     def reportCompat(self, file=None):
